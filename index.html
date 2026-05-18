@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>약분 통분 요리사 🍕</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700;900&display=swap');
+
+  :root {
+    --bg: #1a0a2e;
+    --bg2: #16213e;
+    --card: #0f3460;
+    --accent1: #ff6b35;
+    --accent2: #ffd23f;
+    --accent3: #06ffa5;
+    --accent4: #ff2d78;
+    --accent5: #7c3aed;
+    --text: #fff;
+    --neon: #00f5ff;
+    --p1: #ff6b35;
+    --p2: #06ffa5;
+    --p3: #ff2d78;
+    --p4: #ffd23f;
+    --p5: #a78bfa;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Jua', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ====== SCREENS ====== */
+  .screen { display: none; width: 100vw; height: 100vh; }
+  .screen.active { display: flex; }
+
+  /* ====== START SCREEN ====== */
+  #startScreen {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 0%, #3b0764 0%, #1a0a2e 60%);
+    position: relative;
+    overflow: hidden;
+  }
+  #startScreen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .start-food-bg {
+    position: absolute;
+    font-size: 5vw;
+    animation: floatFood 6s ease-in-out infinite;
+    pointer-events: none;
+    opacity: 0.25;
+  }
+
+  @keyframes floatFood {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(10deg); }
+  }
+
+  .game-title {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    text-align: center;
+    line-height: 1.1;
+    text-shadow: 0 0 30px var(--accent2), 0 0 60px var(--accent1);
+    animation: titlePulse 2s ease-in-out infinite;
+    position: relative;
+    z-index: 2;
+  }
+
+  @keyframes titlePulse {
+    0%, 100% { text-shadow: 0 0 30px var(--accent2), 0 0 60px var(--accent1); }
+    50% { text-shadow: 0 0 50px var(--accent2), 0 0 100px var(--accent1), 0 0 150px #ff006680; }
+  }
+
+  .subtitle {
+    font-size: clamp(0.9rem, 2vw, 1.3rem);
+    color: var(--accent3);
+    margin: 10px 0 30px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    opacity: 0.9;
+  }
+
+  .mode-label {
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    color: var(--accent2);
+    margin-bottom: 15px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .mode-buttons {
+    display: flex;
+    gap: 14px;
+    flex-wrap: nowrap;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    padding: 0 20px;
+  }
+
+  .mode-btn {
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(0.85rem, 1.8vw, 1.25rem);
+    padding: 0;
+    width: clamp(110px, 14vw, 175px);
+    height: clamp(100px, 13vh, 150px);
+    border: 3px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    border-radius: 22px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    backdrop-filter: blur(6px);
+  }
+
+  .mode-btn .btn-icon {
+    font-size: clamp(2rem, 4vw, 3rem);
+    display: block;
+    transition: transform 0.25s;
+  }
+  .mode-btn .btn-label { font-size: clamp(0.75rem, 1.4vw, 1rem); opacity: 0.9; }
+  .mode-btn .btn-sub   { font-size: clamp(0.6rem, 1.1vw, 0.8rem); opacity: 0.55; }
+
+  .mode-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.25s;
+    z-index: 0;
+  }
+  .mode-btn:nth-child(1)::before { background: linear-gradient(135deg,#ff6b35,#ff8c00); }
+  .mode-btn:nth-child(2)::before { background: linear-gradient(135deg,#06ffa5,#00c97a); }
+  .mode-btn:nth-child(3)::before { background: linear-gradient(135deg,#ff2d78,#c026d3); }
+  .mode-btn:nth-child(4)::before { background: linear-gradient(135deg,#ffd23f,#f59e0b); }
+  .mode-btn:nth-child(5)::before { background: linear-gradient(135deg,#a78bfa,#7c3aed); }
+
+  .mode-btn:nth-child(1) { border-color: #ff6b3560; }
+  .mode-btn:nth-child(2) { border-color: #06ffa560; }
+  .mode-btn:nth-child(3) { border-color: #ff2d7860; }
+  .mode-btn:nth-child(4) { border-color: #ffd23f60; }
+  .mode-btn:nth-child(5) { border-color: #a78bfa60; }
+
+  .mode-btn > * { position: relative; z-index: 1; }
+
+  .mode-btn:hover::before, .mode-btn.selected::before { opacity: 1; }
+  .mode-btn:hover, .mode-btn.selected {
+    color: #fff;
+    transform: translateY(-6px) scale(1.07);
+    border-color: transparent;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+  }
+  .mode-btn:hover .btn-icon, .mode-btn.selected .btn-icon { transform: scale(1.15) rotate(-5deg); }
+
+  /* ====== GAME SCREEN ====== */
+  #gameScreen {
+    flex-direction: column;
+    background: linear-gradient(180deg, #0d0221 0%, #1a0a2e 40%, #16213e 100%);
+  }
+
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+    background: rgba(0,0,0,0.4);
+    border-bottom: 2px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+    height: 54px;
+  }
+
+  .question-counter {
+    font-size: 1.1rem;
+    color: var(--accent3);
+  }
+
+  .combo-display {
+    font-size: 1.3rem;
+    color: var(--accent2);
+    animation: comboBounce 0.3s ease;
+    min-width: 120px;
+    text-align: center;
+  }
+  @keyframes comboBounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+
+  /* Question area */
+  .question-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    position: relative;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .customer-bubble {
+    background: linear-gradient(135deg, #1e3a5f, #0f2040);
+    border: 3px solid var(--neon);
+    border-radius: 24px;
+    padding: 18px 28px;
+    max-width: 80%;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0,245,255,0.3);
+  }
+  .customer-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 12px solid transparent;
+    border-top: 12px solid var(--neon);
+  }
+
+  .customer-text {
+    font-size: clamp(1.1rem, 2.8vw, 1.8rem);
+    line-height: 1.5;
+    color: #fff;
+  }
+
+  .food-emoji {
+    font-size: clamp(3rem, 7vw, 5rem);
+    animation: foodBounce 1s ease-in-out infinite;
+    display: block;
+    margin-top: 24px;
+  }
+  @keyframes foodBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+  .question-type-badge {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 900;
+    background: var(--accent5);
+    box-shadow: 0 0 10px var(--accent5);
+  }
+
+  /* Timer bar */
+  .timer-bar-wrap {
+    width: 80%;
+    height: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 5px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+  .timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent3), var(--accent2), var(--accent1));
+    border-radius: 5px;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 8px var(--accent3);
+  }
+
+  /* Player input area */
+  .players-area {
+    display: flex;
+    gap: 6px;
+    padding: 8px;
+    background: rgba(0,0,0,0.5);
+    border-top: 2px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+    align-items: stretch;
+  }
+
+  .player-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 12px;
+    padding: 6px 4px;
+    border: 2px solid;
+    position: relative;
+    transition: all 0.3s;
+  }
+
+  .player-panel.locked {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .player-panel.locked::after {
+    content: '🔒 2초';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    background: rgba(0,0,0,0.6);
+    border-radius: 10px;
+    z-index: 10;
+  }
+
+  .player-name {
+    font-size: clamp(0.75rem, 1.5vw, 1rem);
+    margin-bottom: 3px;
+  }
+
+  .player-score {
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    color: var(--accent2);
+    margin-bottom: 4px;
+  }
+
+  .answer-inputs {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+
+  .fraction-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .fraction-sep { font-size: 1.5rem; color: #ccc; margin: 0 6px; }
+
+  .frac-input {
+    width: clamp(40px, 6vw, 70px);
+    height: clamp(32px, 4.5vh, 48px);
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .frac-input.active-input {
+    border-color: var(--neon);
+    box-shadow: 0 0 12px var(--neon), inset 0 0 8px rgba(0,245,255,0.1);
+    background: rgba(0,245,255,0.05);
+  }
+  .frac-input.filled { border-color: var(--accent3); }
+
+  .fraction-line {
+    width: 100%;
+    height: 2px;
+    background: #fff;
+    border-radius: 1px;
+  }
+
+  .frac-label {
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Keypad — 3열 4행 숫자 키패드 */
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .kbtn {
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    height: clamp(34px, 5vh, 52px);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.1s;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .kbtn:active { transform: scale(0.88); }
+
+  .kbtn.num {
+    background: rgba(255,255,255,0.13);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .kbtn.num:hover { background: rgba(255,255,255,0.24); }
+
+  .kbtn.del {
+    background: rgba(255,100,100,0.28);
+    color: #ff9999;
+    border: 1px solid rgba(255,100,100,0.3);
+  }
+  .kbtn.del:hover { background: rgba(255,100,100,0.48); }
+
+  .kbtn.submit {
+    background: linear-gradient(135deg, var(--accent3), #00c97a);
+    color: #000;
+    font-size: clamp(0.85rem, 1.6vw, 1.1rem);
+    box-shadow: 0 0 10px rgba(6,255,165,0.4);
+    border: none;
+  }
+  .kbtn.submit:hover { box-shadow: 0 0 20px rgba(6,255,165,0.7); transform: scale(1.03); }
+
+  .kbtn.next {
+    background: linear-gradient(135deg, #ffd23f, #f59e0b);
+    color: #000;
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    border: none;
+    font-weight: 900;
+  }
+  .kbtn.next:hover { background: linear-gradient(135deg, #ffe566, #fbbf24); box-shadow: 0 0 12px rgba(255,210,63,0.6); }
+
+  /* ====== RESULT SCREEN ====== */
+  #resultScreen {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 0%, #3b0764 0%, #1a0a2e 70%);
+    position: relative;
+    overflow: hidden;
+    gap: 20px;
+  }
+
+  .result-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    text-align: center;
+    text-shadow: 0 0 30px var(--accent2);
+    animation: titlePulse 1.5s ease-in-out infinite;
+  }
+
+  .rankings {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(500px, 80vw);
+  }
+
+  .rank-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 22px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.15);
+    animation: rankSlideIn 0.5s ease forwards;
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  @keyframes rankSlideIn { to { opacity:1; transform:translateX(0); } }
+
+  .rank-medal { font-size: 2rem; }
+  .rank-name { flex: 1; font-size: 1.3rem; }
+  .rank-pts { font-size: 1.5rem; color: var(--accent2); }
+
+  .restart-btn {
+    font-family: 'Jua', sans-serif;
+    font-size: 1.4rem;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, var(--accent1), var(--accent4));
+    border: none;
+    border-radius: 20px;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 0 30px rgba(255,107,53,0.5);
+    transition: all 0.2s;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .restart-btn:hover { transform: scale(1.05); box-shadow: 0 0 50px rgba(255,107,53,0.8); }
+
+  @keyframes pulse { 0%,100%{box-shadow:0 0 30px rgba(255,107,53,0.5)} 50%{box-shadow:0 0 50px rgba(255,107,53,0.9)} }
+
+  /* ====== FIREWORKS ====== */
+  .firework {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: fireworkBurst 1s ease-out forwards;
+  }
+  @keyframes fireworkBurst {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(20); opacity: 0; }
+  }
+
+  .spark {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  /* ====== FEEDBACK POPUP ====== */
+  .feedback-popup {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    z-index: 1000;
+    pointer-events: none;
+    transition: transform 0.15s cubic-bezier(0.175,0.885,0.32,1.275);
+    text-shadow: 0 0 20px currentColor;
+    white-space: nowrap;
+  }
+  .feedback-popup.show { transform: translateX(-50%) scale(1); }
+  .feedback-popup.hide { transform: translateX(-50%) scale(0) translateY(-40px); opacity: 0; transition: all 0.3s; }
+
+  /* Player color helpers */
+  .pc1 { border-color: var(--p1); }
+  .pc2 { border-color: var(--p2); }
+  .pc3 { border-color: var(--p3); }
+  .pc4 { border-color: var(--p4); }
+  .pc5 { border-color: var(--p5); }
+
+  .input-hint {
+    font-size: clamp(0.6rem, 1.2vw, 0.8rem);
+    color: var(--neon);
+    opacity: 0.8;
+    margin-bottom: 2px;
+    letter-spacing: 0.02em;
+  }
+
+  .score-flash { animation: scoreFlash 0.4s ease; }
+  @keyframes scoreFlash { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
+
+  /* answer reveal overlay */
+  .answer-reveal {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    text-align: center;
+    padding: 6px;
+    font-size: clamp(0.8rem, 1.5vw, 1rem);
+    background: rgba(255,220,50,0.15);
+    border-bottom: 1px solid var(--accent2);
+    color: var(--accent2);
+    z-index: 5;
+    display: none;
+  }
+
+  .correct-mark {
+    position: absolute;
+    top: 4px; right: 4px;
+    font-size: 1.2rem;
+  }
+
+  /* countdown */
+  .next-countdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8rem;
+    color: var(--accent2);
+    text-shadow: 0 0 40px var(--accent2);
+    animation: countDown 0.8s ease-in-out;
+    pointer-events: none;
+    z-index: 500;
+    display: none;
+  }
+  @keyframes countDown { 0%{transform:translate(-50%,-50%) scale(2); opacity:0} 50%{opacity:1} 100%{transform:translate(-50%,-50%) scale(0.8); opacity:0} }
+
+  .order-badge {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #000;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== START SCREEN ===== -->
+<div class="screen active" id="startScreen">
+  <!-- floating foods background -->
+  <div class="start-food-bg" style="top:8%;left:5%;animation-delay:0s">🍕</div>
+  <div class="start-food-bg" style="top:15%;right:8%;animation-delay:1s">🎂</div>
+  <div class="start-food-bg" style="bottom:12%;left:10%;animation-delay:2s">🍫</div>
+  <div class="start-food-bg" style="bottom:8%;right:6%;animation-delay:0.5s">🍣</div>
+  <div class="start-food-bg" style="top:50%;left:2%;animation-delay:1.5s">🧇</div>
+  <div class="start-food-bg" style="top:50%;right:2%;animation-delay:2.5s">🍰</div>
+
+  <div class="game-title">약분 통분 요리사 🍕</div>
+  <div class="subtitle">분수의 달인 셰프가 되어 손님을 만족시켜라! 🎉</div>
+  <div class="mode-label">👇 인원수를 선택하세요!</div>
+  <div class="mode-buttons" id="modeButtons">
+    <button class="mode-btn" onclick="selectMode(1)">
+      <span class="btn-icon">🧑‍🍳</span>
+      <span class="btn-label">1인 플레이</span>
+      <span class="btn-sub">혼자 도전!</span>
+    </button>
+    <button class="mode-btn" onclick="selectMode(2)">
+      <span class="btn-icon">⚔️</span>
+      <span class="btn-label">2인 대결</span>
+      <span class="btn-sub">1 vs 1</span>
+    </button>
+    <button class="mode-btn" onclick="selectMode(3)">
+      <span class="btn-icon">🔥</span>
+      <span class="btn-label">3인 대결</span>
+      <span class="btn-sub">삼파전!</span>
+    </button>
+    <button class="mode-btn" onclick="selectMode(4)">
+      <span class="btn-icon">💥</span>
+      <span class="btn-label">4인 대결</span>
+      <span class="btn-sub">난투!</span>
+    </button>
+    <button class="mode-btn" onclick="selectMode(5)">
+      <span class="btn-icon">🌟</span>
+      <span class="btn-label">5인 대결</span>
+      <span class="btn-sub">최대 경쟁!</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div class="screen" id="gameScreen">
+  <div class="top-bar">
+    <div class="question-counter" id="qCounter">문제 1 / 10</div>
+    <div class="combo-display" id="comboDisplay"></div>
+    <div style="font-size:1rem; color:var(--accent3)" id="topScores"></div>
+  </div>
+
+  <div class="question-area" id="questionArea">
+    <div class="answer-reveal" id="answerReveal"></div>
+    <div class="question-type-badge" id="typeBadge">약분</div>
+    <div class="customer-bubble">
+      <div class="customer-text" id="questionText">문제 로딩중...</div>
+    </div>
+    <span class="food-emoji" id="foodEmoji">🍕</span>
+    <div class="timer-bar-wrap">
+      <div class="timer-bar" id="timerBar"></div>
+    </div>
+  </div>
+
+  <div class="players-area" id="playersArea"></div>
+</div>
+
+<!-- ===== RESULT SCREEN ===== -->
+<div class="screen" id="resultScreen">
+  <div class="result-title" id="resultTitle">🏆 오늘의 마스터 셰프! 🏆</div>
+  <div class="rankings" id="rankings"></div>
+  <button class="restart-btn" onclick="goToStart()">🍕 다시 플레이!</button>
+</div>
+
+<div class="feedback-popup" id="feedbackPopup"></div>
+<div class="next-countdown" id="nextCountdown"></div>
+
+<script>
+// ===================== QUESTION BANK =====================
+const FOODS = ['🍕','🎂','🍫','🍱','🧇','🍰','🥧','🍩','🍪','🍞'];
+const FOOD_NAMES = ['피자','케이크','초콜릿','김밥','와플','조각 케이크','파이','도넛','쿠키','식빵'];
+const FOOD_MAP = {};
+FOODS.forEach((f,i) => FOOD_MAP[f] = FOOD_NAMES[i]);
+
+function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+function lcm(a, b) { return a * b / gcd(a, b); }
+function simplify(n, d) { const g = gcd(Math.abs(n), Math.abs(d)); return [n/g, d/g]; }
+
+// Generate question sets
+function makeReduceQ(emoji) {
+  const name = FOOD_MAP[emoji];
+  const dens = [4,6,8,9,10,12,15];  // 최대 15조각, 조각 수 현실적으로 유지
+  const d = dens[Math.floor(Math.random()*dens.length)];
+  const divisors = [];
+  for(let i=2;i<d;i++) if(d%i===0) divisors.push(i);
+  if(divisors.length===0) return makeReduceQ(emoji);
+  const n = divisors[Math.floor(Math.random()*divisors.length)];
+  const [sn,sd] = simplify(n,d);
+  const dialogues = [
+    `"${name} ${n}/${d}조각 주세요! 조각이 너무 잘게 잘린 것 같은데, 더 크게 간단하게 잘라주세요~ 🍴"`,
+    `"${name} ${n}/${d}만큼이요! 조각이 너무 많아요 😤 같은 양인데 더 큰 조각으로 주세요!"`,
+    `"${name} ${n}/${d}만큼 주세요. 수학 선생님이 꼭 약분해서 달라고 하셨어요 📚"`,
+    `"${name} ${n}/${d}요! 복잡한 건 딱 질색이에요. 가장 간단하게 잘라주세요!"`,
+    `"${name} ${n}/${d}만큼인데요, 이거 약분하면 얼마예요? 그만큼만 잘라주세요 💰"`,
+    `"셰프님~ ${name} ${n}/${d}조각이요! 조각이 너무 많으면 제가 못 먹어요. 간단하게요! 🙏"`,
+  ];
+  return {
+    type:'약분', emoji, food:name,
+    text: dialogues[Math.floor(Math.random()*dialogues.length)],
+    answers: [[sn,sd]],
+    inputCount: 1,
+    hint: `${n}/${d}를 약분하세요`
+  };
+}
+
+function makeCommonDenomQ(emoji) {
+  const name = FOOD_MAP[emoji];
+  const pairs = [[1,3,2,5],[1,2,1,3],[2,3,3,4],[1,4,1,6],[3,5,2,3],[2,5,1,4],[3,8,1,3],[1,6,1,4],[1,3,1,4],[2,3,1,4]];  // 공통분모 최대 24
+  const p = pairs[Math.floor(Math.random()*pairs.length)];
+  const [n1,d1,n2,d2] = p;
+  const l = lcm(d1,d2);
+  const dialogues = [
+    `"${name} ${n1}/${d1}이랑 ${n2}/${d2}만큼 주세요! 두 조각 크기를 꼭 같게 맞춰주세요~ 쌍둥이라서요 👯"`,
+    `"${name} ${n1}/${d1}이랑 ${n2}/${d2} 주문이요! 조각 크기 달리 자르면 싸워요. 같은 기준으로 잘라주세요 😤"`,
+    `"${name} ${n1}/${d1}이랑 ${n2}/${d2}요! 조각 크기 기준을 똑같이 맞춰주세요. 우리 팀 공평하게요 👊"`,
+    `"저 ${n1}/${d1}이고 제 친구는 ${n2}/${d2}만큼 ${name} 먹을 건데요, 같은 크기 조각으로 잘라주세요! 🍽️"`,
+    `"${name} ${n1}/${d1}하고 ${n2}/${d2}, 조각 크기 기준 통일해서 주시면 감사해요~ 엄마 심부름이에요 😊"`,
+  ];
+  return {
+    type:'통분', emoji, food:name,
+    text: dialogues[Math.floor(Math.random()*dialogues.length)],
+    answers: [[n1*l/d1, l], [n2*l/d2, l]],
+    inputCount: 2,
+    hint:`${n1}/${d1}과 ${n2}/${d2}를 통분하세요 (공통분모: ${l})`
+  };
+}
+
+function makeFindSameQ(emoji) {
+  const name = FOOD_MAP[emoji];
+  // give fraction, ask for equivalent with given denominator
+  const pairs = [[1,2,4],[1,3,3],[2,3,3],[3,4,2],[1,4,3],[2,5,2],[3,5,3],[1,2,3],[2,3,2],[3,4,3]];  // newD = d*mult, 최대 12
+  const [n,d,mult] = pairs[Math.floor(Math.random()*pairs.length)];
+  const newD = d*mult;
+  const newN = n*mult;
+  const dialogues = [
+    `"${name} ${n}/${d}만큼인데요, ${newD}조각으로 나눈 것 기준으로 바꾸면 몇 조각이에요? 🤔"`,
+    `"${name} ${n}/${d}이요! ${newD}등분짜리로 주세요. 같은 양이면 돼요!"`,
+    `"${name} ${n}/${d}만큼이요~ 친구네 ${name}이랑 조각 크기 맞추려고요. 걔네 ${newD}등분이에요!"`,
+    `"셰프님, ${name} ${n}/${d}이랑 똑같은데 ${newD}조각짜리로 잘라주시면요? 몇 조각이에요? 😊"`,
+  ];
+  return {
+    type:'같은 분수', emoji, food:name,
+    text: dialogues[Math.floor(Math.random()*dialogues.length)],
+    answers: [[newN, newD]],
+    inputCount: 1,
+    hint:`${n}/${d} = ?/${newD}`
+  };
+}
+
+function makeCompareQ(emoji) {
+  const name = FOOD_MAP[emoji];
+  const pairs = [
+    [[2,3],[3,5]],[[3,4],[5,7]],[[1,2],[3,7]],[[4,5],[5,6]],
+    [[2,9],[1,4]],[[5,8],[3,5]],[[7,10],[2,3]],[[1,3],[2,7]]
+  ];
+  const p = pairs[Math.floor(Math.random()*pairs.length)];
+  const [[n1,d1],[n2,d2]] = p;
+  const l = lcm(d1,d2);
+  const c1 = n1*l/d1, c2 = n2*l/d2;
+  const bigger = c1>c2 ? [n1,d1] : [n2,d2];
+  const dialogues = [
+    `"${name} ${n1}/${d1}이랑 ${n2}/${d2} 중에 더 많은 거 주세요! 배고파요 😋"`,
+    `"${name} ${n1}/${d1}이랑 ${n2}/${d2} 중에 어느 게 더 큰 조각이에요? 그걸로 주세요!"`,
+    `"오늘 많이 못 먹었어요. ${name} ${n1}/${d1}이랑 ${n2}/${d2} 중에 더 많은 쪽이요! 🙋"`,
+    `"${name} 두 개 중에 ${n1}/${d1}이랑 ${n2}/${d2}, 어느 게 더 크죠? 더 큰 걸로 주세요 😤"`,
+  ];
+  return {
+    type:'크기 비교', emoji, food:name,
+    text: dialogues[Math.floor(Math.random()*dialogues.length)],
+    answers: [bigger],
+    inputCount: 1,
+    hint:`${n1}/${d1}과 ${n2}/${d2} 중 어느 것이 더 클까요?`
+  };
+}
+
+function makeBlankQ(emoji) {
+  const name = FOOD_MAP[emoji];
+  const cases = [
+    {text:`"${name} □/6만큼 주세요~ 1/2이랑 같은 양이어야 해요!"`, answers:[[3,6]], hint:'1/2 = □/6'},
+    {text:`"${name} 2/□만큼이요! 1/4이랑 같은 양으로요."`, answers:[[2,8]], hint:'1/4 = 2/□'},
+    {text:`"${name} □/12만큼 주세요, 3/4이랑 같아야 해요!"`, answers:[[9,12]], hint:'3/4 = □/12'},
+    {text:`"${name} 4/□만큼이요, 1/3이랑 같은 양이면 돼요!"`, answers:[[4,12]], hint:'1/3 = 4/□'},
+    {text:`"${name} □/10만큼 주문이요~ 2/5이랑 같아야 해요!"`, answers:[[4,10]], hint:'2/5 = □/10'},
+    {text:`"${name} 6/□만큼이요, 3/4이랑 같은 크기로 잘라주세요!"`, answers:[[6,8]], hint:'3/4 = 6/□'},
+    {text:`"${name} □/15만큼이요~ 1/3이랑 같은 양이에요!"`, answers:[[5,15]], hint:'1/3 = □/15'},
+    {text:`"${name} 3/□만큼이요, 1/5이랑 딱 같아야 해요!"`, answers:[[3,15]], hint:'1/5 = 3/□'},
+    {text:`"${name} □/8만큼 주세요~ 1/2이랑 같은 양이에요!"`, answers:[[4,8]], hint:'1/2 = □/8'},
+    {text:`"${name} 2/□만큼이요~ 1/6이랑 같아야 해요!"`, answers:[[2,12]], hint:'1/6 = 2/□'},
+  ];
+  const c = cases[Math.floor(Math.random()*cases.length)];
+  return { type:'빈칸 채우기', emoji, food:name, ...c, inputCount:1 };
+}
+
+const GENERATORS = [makeReduceQ, makeReduceQ, makeCommonDenomQ, makeCommonDenomQ, makeFindSameQ, makeCompareQ, makeBlankQ];
+
+function generateQuestions(n=10) {
+  const qs = [];
+  for(let i=0;i<n;i++) {
+    const emoji = FOODS[Math.floor(Math.random()*FOODS.length)];
+    const gen = GENERATORS[Math.floor(Math.random()*GENERATORS.length)];
+    qs.push(gen(emoji));
+  }
+  return qs;
+}
+
+// ===================== GAME STATE =====================
+let numPlayers = 1;
+let players = [];
+let questions = [];
+let currentQ = 0;
+let timerInterval = null;
+let timerVal = 0;
+const TIME_LIMIT = 30;
+const BASE_POINTS = [500,350,250,150,100];
+let questionDone = false;
+let firstCorrectOrder = 0;
+let totalCombos = {};
+
+const PLAYER_COLORS = ['#ff6b35','#06ffa5','#ff2d78','#ffd23f','#a78bfa'];
+const PLAYER_NAMES = ['🔴 P1','🟢 P2','🔴 P3','🟡 P4','🟣 P5'];
+
+function selectMode(n) {
+  numPlayers = n;
+  document.querySelectorAll('.mode-btn').forEach((b,i) => b.classList.toggle('selected', i===n-1));
+  setTimeout(() => startGame(), 400);
+}
+
+function startGame() {
+  players = Array.from({length:numPlayers},(_,i)=>({
+    id:i, name: PLAYER_NAMES[i], score:0, combo:0, locked:false, lockTimer:null
+  }));
+  questions = generateQuestions(10);
+  currentQ = 0;
+  questionDone = false;
+  firstCorrectOrder = 0;
+
+  showScreen('gameScreen');
+  buildPlayersUI();
+  loadQuestion();
+}
+
+function buildPlayersUI() {
+  const area = document.getElementById('playersArea');
+  area.innerHTML = '';
+  players.forEach(p => {
+    const panel = document.createElement('div');
+    panel.className = `player-panel pc${p.id+1}`;
+    panel.id = `panel${p.id}`;
+    panel.style.borderColor = PLAYER_COLORS[p.id];
+    panel.innerHTML = `
+      <div class="player-name" style="color:${PLAYER_COLORS[p.id]}">${p.name}</div>
+      <div class="player-score" id="score${p.id}">0점</div>
+      <div class="input-hint" id="inputhint${p.id}">👇 분모 입력 중</div>
+      <div class="answer-inputs" id="inputs${p.id}"></div>
+      <div class="keypad" id="keypad${p.id}"></div>
+      <div class="correct-mark" id="mark${p.id}"></div>
+    `;
+    area.appendChild(panel);
+  });
+}
+
+function loadQuestion() {
+  if(currentQ >= questions.length) { endGame(); return; }
+  questionDone = false;
+  firstCorrectOrder = 0;
+
+  const q = questions[currentQ];
+  document.getElementById('qCounter').textContent = `문제 ${currentQ+1} / 10`;
+  document.getElementById('questionText').textContent = q.text;
+  document.getElementById('foodEmoji').textContent = q.emoji;
+  document.getElementById('typeBadge').textContent = q.type;
+  document.getElementById('answerReveal').style.display = 'none';
+  document.getElementById('comboDisplay').textContent = '';
+
+  // Show per-player inputs
+  players.forEach(p => {
+    document.getElementById(`mark${p.id}`).textContent = '';
+    buildInputs(p.id, q.inputCount);
+    buildKeypad(p.id);
+    setLocked(p.id, false);
+  });
+
+  startTimer();
+}
+
+// Per-player state: which input is active
+const playerState = {};
+
+function buildInputs(pid, count) {
+  const wrap = document.getElementById(`inputs${pid}`);
+  wrap.innerHTML = '';
+  // vals layout per fraction: [den0, num0, den1, num1, ...]
+  // active starts at 0 = first fraction's denominator
+  playerState[pid] = { active: 0, vals: Array(count*2).fill('') };
+
+  for(let i=0;i<count;i++) {
+    if(i>0) {
+      const sep = document.createElement('div');
+      sep.className='fraction-sep'; sep.textContent=',';
+      wrap.appendChild(sep);
+    }
+    const fg = document.createElement('div');
+    fg.className='fraction-group';
+
+    // numerator display box (top) — index i*2+1
+    const numInput=document.createElement('div');
+    numInput.className='frac-input';
+    numInput.id=`fi${pid}_${i*2+1}`;
+    numInput.textContent='';
+
+    const line=document.createElement('div'); line.className='fraction-line';
+
+    // denominator display box (bottom) — index i*2
+    const denInput=document.createElement('div');
+    denInput.className='frac-input';
+    denInput.id=`fi${pid}_${i*2}`;
+    denInput.textContent='';
+
+    const nlabel=document.createElement('div'); nlabel.className='frac-label'; nlabel.textContent='분자';
+    const dlabel=document.createElement('div'); dlabel.className='frac-label'; dlabel.textContent='분모';
+
+    fg.appendChild(nlabel);
+    fg.appendChild(numInput);
+    fg.appendChild(line);
+    fg.appendChild(denInput);
+    fg.appendChild(dlabel);
+    wrap.appendChild(fg);
+  }
+  // active = 0 = first denominator
+  setActiveInput(pid, 0);
+}
+
+function setActiveInput(pid, idx) {
+  const q = questions[currentQ];
+  const total = q.inputCount * 2;
+  playerState[pid].active = idx;
+  for(let i=0;i<total;i++) {
+    const el = document.getElementById(`fi${pid}_${i}`);
+    if(!el) continue;
+    el.classList.toggle('active-input', i===idx);
+    el.classList.toggle('filled', playerState[pid].vals[i]!=='');
+  }
+  // show hint: even idx = 분모, odd idx = 분자
+  const hintEl = document.getElementById(`inputhint${pid}`);
+  if(hintEl) hintEl.textContent = (idx % 2 === 0) ? '👇 분모 입력 중' : '👆 분자 입력 중';
+}
+
+function buildKeypad(pid) {
+  const kp = document.getElementById(`keypad${pid}`);
+  kp.innerHTML = '';
+  // 3열 5행: 1 2 3 / 4 5 6 / 7 8 9 / ← 0 → / ─제출(전체)─
+  const keys = [1,2,3,4,5,6,7,8,9,'←',0,'→','제출'];
+  keys.forEach(k => {
+    const btn = document.createElement('button');
+    if(k==='제출') {
+      btn.className = 'kbtn submit';
+      btn.style.gridColumn = '1 / -1'; // full row
+    } else if(k==='←') {
+      btn.className = 'kbtn del';
+    } else if(k==='→') {
+      btn.className = 'kbtn next';
+    } else {
+      btn.className = 'kbtn num';
+    }
+    btn.textContent = k;
+    btn.addEventListener('click',()=>handleKey(pid,k));
+    kp.appendChild(btn);
+  });
+}
+
+function handleKey(pid, key) {
+  if(players[pid].locked || questionDone) return;
+  const st = playerState[pid];
+  const q = questions[currentQ];
+  const total = q.inputCount * 2;
+
+  if(key==='←') {
+    if(st.vals[st.active]!=='') {
+      // delete last digit of current slot
+      st.vals[st.active] = st.vals[st.active].slice(0, -1);
+      updateInput(pid, st.active);
+      setActiveInput(pid, st.active);
+    } else if(st.active > 0) {
+      // move back and clear previous slot
+      st.active--;
+      st.vals[st.active] = '';
+      updateInput(pid, st.active);
+      setActiveInput(pid, st.active);
+    }
+    return;
+  }
+  if(key==='→') {
+    // manually advance to next slot (only if current slot has at least 1 digit)
+    if(st.vals[st.active] !== '' && st.active < total - 1) {
+      setActiveInput(pid, st.active + 1);
+    }
+    return;
+  }
+  if(key==='제출') { submitAnswer(pid); return; }
+
+  // number — NO auto-advance; player presses → to move to next slot
+  if(st.vals[st.active].length >= 2) return; // max 2 digits per slot
+  st.vals[st.active] += key;
+  updateInput(pid, st.active);
+}
+
+function updateInput(pid, idx) {
+  const el = document.getElementById(`fi${pid}_${idx}`);
+  if(!el) return;
+  el.textContent = playerState[pid].vals[idx] || '';
+  el.classList.toggle('filled', playerState[pid].vals[idx]!=='');
+}
+
+function submitAnswer(pid) {
+  if(players[pid].locked || questionDone) return;
+  const q = questions[currentQ];
+  const st = playerState[pid];
+  // parse answers — vals[i*2]=분모, vals[i*2+1]=분자
+  const userAnswers = [];
+  for(let i=0;i<q.inputCount;i++) {
+    const d = parseInt(st.vals[i*2]);   // denominator entered first
+    const n = parseInt(st.vals[i*2+1]); // numerator entered second
+    if(isNaN(n)||isNaN(d)||d===0) { showWrong(pid); return; }
+    userAnswers.push([n,d]);
+  }
+  // check
+  const correct = checkAnswer(q, userAnswers);
+  if(correct) {
+    const order = firstCorrectOrder;
+    firstCorrectOrder++;
+    const pts = Math.max(50, BASE_POINTS[Math.min(order, BASE_POINTS.length-1)] + Math.round(timerVal/TIME_LIMIT * 100));
+    players[pid].score += pts;
+    players[pid].combo++;
+    showCorrect(pid, pts, players[pid].combo);
+    document.getElementById(`score${pid}`).textContent = players[pid].score + '점';
+    document.getElementById(`score${pid}`).classList.add('score-flash');
+    setTimeout(()=>document.getElementById(`score${pid}`).classList.remove('score-flash'),400);
+    document.getElementById(`mark${pid}`).textContent = ['🥇','🥈','🥉','🎖️','🎗️'][order] || '✅';
+
+    // update top bar
+    updateTopBar();
+
+    // if all players answered or single player
+    if(numPlayers===1) {
+      revealAndNext(q);
+    } else {
+      setLocked(pid, true, true); // show answered, not penalty
+      if(firstCorrectOrder >= numPlayers) revealAndNext(q);
+    }
+  } else {
+    showWrong(pid);
+    players[pid].combo = 0;
+  }
+}
+
+function checkAnswer(q, userAnswers) {
+  if(userAnswers.length !== q.answers.length) return false;
+  for(let i=0;i<q.answers.length;i++) {
+    const [un,ud] = userAnswers[i];
+    const [an,ad] = q.answers[i];
+    // check if same fraction value
+    if(un*ad !== ud*an) return false;
+    // for reduce type, must be fully reduced
+    if(q.type==='약분') {
+      const [sn,sd] = simplify(un,ud);
+      if(sn!==un||sd!==ud) return false;
+    }
+    // for commondenom, both must have same denominator
+    if(q.type==='통분') {
+      const denoms = userAnswers.map(a=>a[1]);
+      if(new Set(denoms).size > 1) return false;
+    }
+  }
+  return true;
+}
+
+function showCorrect(pid, pts, combo) {
+  const msgs = ['🎉 정답!', '✨ 완벽해!', '🔥 굿잡!', '⭐ 대박!', '🍕 맛있게!'];
+  showFeedback(msgs[Math.floor(Math.random()*msgs.length)] + ' +'+pts, PLAYER_COLORS[pid]);
+  if(combo >= 3) {
+    document.getElementById('comboDisplay').textContent = `🔥 ${combo}콤보!`;
+  }
+}
+
+function showWrong(pid) {
+  setLocked(pid, true, false, 2000);
+  const el = document.getElementById(`panel${pid}`);
+  el.style.animation = 'wrongShake 0.4s ease';
+  setTimeout(()=>el.style.animation='', 400);
+  showFeedback('❌ 오답! 2초 대기', '#ff4444');
+}
+
+function setLocked(pid, locked, correct=false, ms=0) {
+  players[pid].locked = locked;
+  const panel = document.getElementById(`panel${pid}`);
+  if(locked && !correct) {
+    panel.classList.add('locked');
+    if(ms>0) setTimeout(()=>{ players[pid].locked=false; panel.classList.remove('locked'); }, ms);
+  } else {
+    panel.classList.remove('locked');
+  }
+}
+
+function revealAndNext(q) {
+  questionDone = true;
+  clearInterval(timerInterval);
+  const revEl = document.getElementById('answerReveal');
+  revEl.style.display = 'block';
+  const ansStr = q.answers.map(([n,d])=>`${n}/${d}`).join(' , ');
+  revEl.textContent = `✅ 정답: ${ansStr}  |  ${q.hint}`;
+
+  setTimeout(()=>{
+    currentQ++;
+    loadQuestion();
+  }, 2200);
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerVal = TIME_LIMIT;
+  const bar = document.getElementById('timerBar');
+  bar.style.width = '100%';
+  bar.style.background = 'linear-gradient(90deg, var(--accent3), var(--accent2), var(--accent1))';
+  timerInterval = setInterval(()=>{
+    timerVal -= 0.1;
+    const pct = Math.max(0, timerVal/TIME_LIMIT*100);
+    bar.style.width = pct+'%';
+    if(pct < 30) bar.style.background = 'linear-gradient(90deg, #ff4444, #ff8800)';
+    if(timerVal <= 0) {
+      clearInterval(timerInterval);
+      if(!questionDone) timeUp();
+    }
+  }, 100);
+}
+
+function timeUp() {
+  questionDone = true;
+  const q = questions[currentQ];
+  showFeedback('⏰ 시간초과!', '#ff8800');
+  const revEl = document.getElementById('answerReveal');
+  revEl.style.display = 'block';
+  const ansStr = q.answers.map(([n,d])=>`${n}/${d}`).join(' , ');
+  revEl.textContent = `⏰ 시간초과! 정답: ${ansStr}`;
+  setTimeout(()=>{ currentQ++; loadQuestion(); }, 2000);
+}
+
+function updateTopBar() {
+  const sorted = [...players].sort((a,b)=>b.score-a.score);
+  document.getElementById('topScores').textContent = sorted.map(p=>`${p.name}:${p.score}`).join(' | ');
+}
+
+function showFeedback(msg, color='#fff') {
+  const el = document.getElementById('feedbackPopup');
+  el.textContent = msg;
+  el.style.color = color;
+  el.classList.remove('hide');
+  el.classList.add('show');
+  setTimeout(()=>{ el.classList.remove('show'); el.classList.add('hide'); }, 1200);
+  setTimeout(()=>{ el.classList.remove('hide'); }, 1600);
+}
+
+function endGame() {
+  clearInterval(timerInterval);
+  showScreen('resultScreen');
+  const sorted = [...players].sort((a,b)=>b.score-a.score);
+  const medals = ['🥇','🥈','🥉','🎖️','🎗️'];
+  const rankDiv = document.getElementById('rankings');
+  rankDiv.innerHTML = '';
+
+  // winner title
+  if(numPlayers===1) {
+    document.getElementById('resultTitle').textContent = '🏆 오늘의 마스터 셰프! 🏆';
+  } else {
+    document.getElementById('resultTitle').textContent = `🏆 ${sorted[0].name} 마스터 셰프! 🏆`;
+  }
+
+  sorted.forEach((p,i)=>{
+    const card = document.createElement('div');
+    card.className = 'rank-card';
+    card.style.animationDelay = (i*0.15)+'s';
+    card.style.borderColor = PLAYER_COLORS[p.id];
+    card.innerHTML = `<div class="rank-medal">${medals[i]||'🎗️'}</div>
+      <div class="rank-name" style="color:${PLAYER_COLORS[p.id]}">${p.name}</div>
+      <div class="rank-pts">${p.score}점</div>`;
+    rankDiv.appendChild(card);
+  });
+
+  launchFireworks();
+}
+
+function launchFireworks() {
+  for(let i=0;i<40;i++) {
+    setTimeout(()=>{
+      const fw = document.createElement('div');
+      fw.style.cssText = `position:fixed;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:9999;`;
+      const colors=['#ff6b35','#ffd23f','#06ffa5','#ff2d78','#a78bfa','#00f5ff'];
+      fw.style.background = colors[Math.floor(Math.random()*colors.length)];
+      const x = Math.random()*100; const y = Math.random()*80;
+      fw.style.left = x+'%'; fw.style.top = y+'%';
+      fw.style.animation = `fireworkBurst ${0.6+Math.random()*0.8}s ease-out forwards`;
+      document.body.appendChild(fw);
+      setTimeout(()=>fw.remove(), 1500);
+    }, i*120);
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goToStart() {
+  showScreen('startScreen');
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('selected'));
+}
+
+// Add wrong shake animation
+const style = document.createElement('style');
+style.textContent = `@keyframes wrongShake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>
